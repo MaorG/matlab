@@ -1,0 +1,20 @@
+function [energy] = getEnergy (data, ngh)
+    world = data.world;
+
+    offsets = [];
+    for ii = -ngh:ngh
+        for jj = 1:ngh
+            offsets = [offsets ; [ii,jj]];
+        end
+    end
+    
+    for ii= 1:ngh
+            offsets = [offsets ; [ii,0]];
+    end
+
+    glcm = graycomatrix(world, 'NumLevels', 3, 'offset', offsets, 'Symmetric', true, 'GrayLimits', []);
+
+    glcm = glcm(2:3, 2:3, :);
+    stats = graycoprops(glcm,{'energy'});
+    energy = mean(stats.Energy);
+end

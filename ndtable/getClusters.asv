@@ -1,0 +1,136 @@
+function [ids] = getClusters (data, varargin)
+
+tol = 0.1;
+nVarargs = length(varargin{1});
+if (nVarargs == 1) 
+    tol = varargin{1}{1};
+end
+
+if (numel(data.agents) == 0)
+    ids = [];
+    return
+end
+
+width = data.width*data.scale;
+height = data.height*data.scale;
+x = extractfield(data.agents, 'X')';
+y = extractfield(data.agents, 'Y')';
+r = extractfield(data.agents, 'radius')';
+
+rMax = max(r);
+ixroll = find(x < 2*rMax + tol);
+newX = [x; x(ixroll) + width];
+newY = [y; y(ixroll)];
+newR = [r; r(ixroll)];
+rollIndices = [1:numel(x), ixroll'];
+iyroll = find(newY < 2*rMax + tol);
+newX = [newX; newX(iyroll)];
+newY = [newY; newY(iyroll) + height];
+newR = [newR; newR(iyroll)];
+rollIndices = [rollIndices, iyroll'];
+
+DT = delaunayTriangulation(newX,newY);
+
+
+triN = numel(DT.ConnectivityList);
+
+size(DT.ConnectivityList))
+pairs = [DT.ConnectivityList(:,1), DT.ConnectivityList(:,2); DT.ConnectivityList(:,2), DT.ConnectivityList(:,3); DT.ConnectivityList(:,3), DT.ConnectivityList(:,1)];
+
+ngh1 = zeros(triN,1);
+ngh2 = zeros(triN,1);
+D = zeros(triN,1);
+
+count = 0;
+for i = 1:size(pairs,1)
+     i1 = pairs(i,1);
+     i2 = pairs(i,2);
+     if (i1 < i2);
+        x1 = newX(i1);
+        y1 = newY(i1);
+        r1 = newR(i1);
+        x2 = newX(i2);
+        y2 = newY(i2);
+        r2 = newR(i2);
+        centersDist = sqrt((x1-x2)^2 + (y1-y2)^2);
+        effectiveDist = centersDist - r1 - r2;
+        if (effectiveDist < tol)
+            ngh1(count+1) = rollIndices(i1);
+            ngh2(count+1) = rollIndices(i2);
+            D(count+1) = 1;
+            ngh1(count+2) = rollIndices(i2);
+            ngh2(count+2) = rollIndices(i1);
+            D(count+2) = 1;
+            count = count + 2;
+        end
+    end 
+end
+
+
+% ngh1 = rollIndices(ngh1);
+% ngh2 = rollIndices(ngh2);
+
+hits = (ngh1 ~= 0);
+ngh1 = ngh1(hits);
+ngh2 = ngh2(hits);
+D = D(hits);
+
+%Edges = sparse(ngh1, ngh2, D, numel(x),numel(x));
+Edges = sparse(ngh1, ngh2, D);
+
+[S,C] = conncomp(Edges);
+ids = C;
+
+end 
+
+function [S,C] = conncomp(G)
+  [p,q,r] = dmperm(G'+speye(size(G)));
+  S = numel(r)-1;
+  C = cumsum(full(sparse(1,r(1:end-1),1,1,size(G,1))));
+  C(p) = C;
+end
+
+function [scanline_y] = removeFromScanline(scanline_y, event)
+    % very naive implementation
+    i_event_source_idx = 6;
+    idx = scanline_y(i_event_source_idx,:) == event(i_event_source_idx); 
+    scanline_y(:,idx) = [];
+end
+
+function [scanline_y] = insertToScanline(scanline_y, event)
+    % very naive implementation
+    scanline_y = [scanline_y, event];
+end
+
+
+% function [scanline_min_y, scanline_max_y] = insertToScanline2(scanline_min_y, scanline_max_y, event)
+%     % very naive implementation
+%     scanline_min_y = [scanline_min_y; [event(3) - r, event(6)]];
+%     [~,idx]=sort(scanline_min_y(1,:));
+%     scanline_min_y = scanline_min_y(:,idx);
+%     
+%     scanline_max_y = [scanline_max_y; [event(3) + r, event(6)]];
+%     [~,idx]=sort(scanline_max_y(1,:));
+%     scanline_max_y = scanline_max_y(:,idx);
+% end
+
+function [eventIndicesInWindow] = getEventIndicesInWindow(event, scanline_y, tol)
+i_y = 3;
+i_r = 4;
+i_event_idx = 7;
+
+    event_y_min = event(i_y) - event(i_r);
+    event_y_max = event(i_y) + event(i_r);
+    eventIndicesInWindow = [];
+    for i = 1:size(scanline_y,2)
+        other_event_y_min = scanline_y(i_y,i) - scanline_y(i_r,i);
+        other_event_y_max = scanline_y(i_y,i) + scanline_y(i_r,i);
+        if (event_y_max + tol > other_event_y_max && event_y_min - tol < other_event_y_min)
+            eventIndicesInWindow = [eventIndicesInWindow, scanline_y(i_event_idx,i)];
+        end
+    end
+end
+
+function [isOverlapping] = check_overlap(x1, y1, r1, x2, y2, r2, tol)
+isOverlapping = (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) < (r1 + r2 + tol) * (r1 + r2 + tol);
+end

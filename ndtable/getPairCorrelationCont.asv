@@ -1,0 +1,49 @@
+function [result] = getPairCorrelationCont (data, varargin)
+    
+    dr = varargin{1};
+    parameters1 = varargin{2};
+    parameters2 = varargin{3};
+
+    w = data.width;
+    h = data.height;
+    
+    i1 = getAgentIndcesByProperties(data, parameters1);
+    i2 = getAgentIndcesByProperties(data, parameters2);
+    
+    [h, w] = size(world);
+    maxr = ceil ( min(h, w) / 2 );
+    
+    x = extractfield(data.agents, 'X')';
+    y = extractfield(data.agents, 'Y')';
+
+    x1 = x(i1);
+    x2 = x(i2);
+    y1 = y(i1);
+    y2 = y(i2);
+
+    % toroidal world, wrap x2 y2
+    i2left = find(x2 < maxr);
+    i2right = find(x2 > h - maxr);
+    
+    newX2 = [x2; x2(i2left) + w ; x2(i2right) - w];
+    newY2 = [y2; y2(i2left); y2(i2right)];
+    
+    i2top = find(newY2 < maxr);
+    i2bottom = find(newY2 > h - maxr);
+    newX2 = [x2; x2(i2left) + w ; x2(i2right) - w];
+    newY2 = [y2; y2(i2left); y2(i2right)];
+    
+
+    
+    if (numel(row1) == 0 || numel(row2) == 0)
+        corr = zeros(1);
+        r = zeros(1);
+        r(1) = dr;
+    else
+%    [row2, col2] = find(world == type2);
+        [corr, r, wr] = twopointcrosscorr(row1, col1, row2, col2, dr, maxr, 1000, false);
+    end
+    result = [r ; corr];
+
+end
+

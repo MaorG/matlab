@@ -1,0 +1,14 @@
+function [] = showAgents(data)
+
+% get world size
+
+% get agents properties
+
+X = extractfield(data.agents, 'X');
+Y = extractfield(data.agents, 'X');
+R = extractfield(data.agents, 'X');
+
+scatter(X,Y,R);
+
+
+end

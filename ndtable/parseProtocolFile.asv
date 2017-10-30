@@ -1,0 +1,46 @@
+function [batchParams] = parseProtocolFile( xTree )
+
+xRoot = xTree.getDocumentElement;
+batchParams = findAllBatchAttributes(xRoot);
+
+end
+
+function [batchParams] = findAllBatchAttributes(xRoot)
+batchParams = [];
+batchParams = findAllBatchAttributesRecursive(xRoot, batchParams);
+
+end
+
+function [batchParams] = findAllBatchAttributesRecursive(theNode, batchParams)
+
+
+if theNode.hasChildNodes
+    childNodes = theNode.getChildNodes;
+    numChildNodes = childNodes.getLength;
+    
+    for count = 1:numChildNodes
+        theChild = childNodes.item(count-1);
+        if theChild.hasAttributes
+            batchAttr = theChild.getAttribute('batch');
+            if ~isEmpty(batchAttr)
+                batchParams = [batchParams, 1];
+            end
+        end
+        batchParam = findAllBatchAttributesRecursive(theChild, batchParams);
+   end
+end
+
+
+return
+for ii = 1:entries.getLength-1
+    
+    
+    batchAttr = entries.item(ii).getAttribute('batch');
+    if ~isEmpty(batchAttr)
+        batchParams = batchParams + 1;
+    end
+    batchParams = findAllBatchAttributesRecursive(entries.item(ii), batchParams);
+end
+
+
+end

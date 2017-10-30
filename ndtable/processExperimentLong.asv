@@ -1,0 +1,40 @@
+clear;
+
+% definitions
+expDirName = 'C:\simulators\NetLogo 5.2.1\matlab\models\heho_inter_3\';
+expOutName = strcat(expDirName, 'output\');
+
+% todo - clear directory and run exp, wait for finish
+% https://ccl.northwestern.edu/netlogo/docs/behaviorspace.html
+
+% parse input
+allData = parseExperimentDir(expOutName);
+
+%score data
+allData = scoreAllData(allData, @getSI, 'SI'); 
+allData = scoreAllData(allData, @getEnergy, 'energy'); 
+%allData = scoreAllData(allData, @getMixScale, 'mix'); 
+allData = scoreAllData(allData, @getARatio, 'ratio'); 
+allData = scoreAllData(allData, @getTotalCount, 'count');
+%allData = scoreAllData(allData, @getLacunarity, 'lacunarity'); 
+
+
+FigHandle = figure(15);
+suptitle (expDirName)
+set(FigHandle, 'Position', [100, 100, 750, 250]);
+% diplay results
+
+classifiedData = [];
+
+classifiedData = [classifiedData; allData([allData.paramA] > 0 & [allData.paramB] > 0)];
+classifiedData = [classifiedData; allData([allData.paramA] > 0 & [allData.paramB] < 0)];
+classifiedData = [classifiedData; allData([allData.paramA] > 0 & [allData.paramB] == 0)];
+
+classifiedData = [classifiedData; allData([allData.paramA] == 0 & [allData.paramB] > 0)];
+classifiedData = [classifiedData; allData([allData.paramA] == 0 & [allData.paramB] < 0)];
+classifiedData = [classifiedData; allData([allData.paramA] == 0 & [allData.paramB] == 0)];
+
+classifiedData = [classifiedData; allData([allData.paramA] < 0 & [allData.paramB] > 0)];
+classifiedData = [classifiedData; allData([allData.paramA] < 0 & [allData.paramB] < 0)];
+classifiedData = [classifiedData; allData([allData.paramA] < 0 & [allData.paramB] == 0)];
+

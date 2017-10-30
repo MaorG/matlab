@@ -1,0 +1,4 @@
+function [count] = getCountOfPopulation (data, varargin)
+popName = varargin{1}{1};
+count = data.population.(popName);
+end

@@ -1,0 +1,5 @@
+function script_start_vs_rand
+
+allDataStrat = allData_18_strat;
+allDataRand = allData_18_rand;
+
