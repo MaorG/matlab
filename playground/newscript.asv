@@ -53,8 +53,8 @@ rt11 = createNDResultTable(allData, 'p11', pNames);
 % get mean and ste
 
 TT = rt10.T;
-for i = 1:numel(TT)
-    if (~isempty(TT{i}))
+for i = 1:numel(rt10.T)
+    if (~isempty(rt10.T{i}))
 
         m10 = mean(cell2mat(rt10.T{i}));
         m11 = mean(cell2mat(rt11.T{i}));
@@ -72,38 +72,28 @@ end
 % manipulate data
 rt2 = rt10;
 rt2.T = TT;
-
-
-rt3 = colateFieldResultTable(rt2, 'd1');
-
-ppp = @(m) plot2d(m,1);
-tableUI(rt3,ppp,[])
-
 rt3 = colateFieldResultTable(rt2, 'attach');
 
 % table 2 mat
 TT = rt3.T;
-mat = nan(size(TT));
-for i = 1:numel(TT)
-    if (~isempty(TT{i}))
-        v0 = TT{i}{1}(2,1);
-        v1 = TT{i}{1}(2,2);
-        v2 = TT{i}{1}(2,3);
-        
-        if v0 > v1 && v0 > v2
-            mat(i) = 0;
-        elseif v1 > v2
-            mat(i) = 1;
-        else
-            mat(i) = 2;
-        end
+mat
+matG = 
+matB = 
+for i = 1:numel(rt10.T)
+    if (~isempty(rt10.T{i}))
+
+        m10 = mean(cell2mat(rt10.T{i}));
+        m11 = mean(cell2mat(rt11.T{i}));
+        s10 = std(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
+        s11 = std(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
+
+        m1 = mean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
+        s1 = std(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
+        TT{i} = {[m1,s1, m10, m11]};
     else
         TT{i} = {nan};
     end
 end
-
-mat2 = reshape(mat,[4,6]);
-
 
 
 
