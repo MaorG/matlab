@@ -1,0 +1,7 @@
+seriesC1 = scriptBF_17_5_17('/home/maor/school/microscopy/17.5.17/example/')
+
+dp = scoreAllData(dataPrev, 'aad', @getAttachVsAreaVsDist, 'Rclusters', 'Gclusters', [power(2,4:20)],[3:60:243]);
+
+pNames = {'time', 'conc', 'signal'};
+rt5 = createNDResultTable(dp, 'aad', pNames);
+tableUI(rt5,@showAttachVsAreaVsDist,[]);

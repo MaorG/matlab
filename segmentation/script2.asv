@@ -1,0 +1,43 @@
+fileName = 'C:\school\microscopy\seg_exp\exp2.tif';
+
+
+I = imread(fileName);
+
+Ismall = I(1:2048,1:2048);
+
+S = Segmentation;
+
+S.I = Ismall;
+
+S = S.createLaplacian(3);
+
+thresholds = [0.15, 0.2, 0.25, 0.3, 0.35];
+
+mal = struct;
+
+propName = 'MinorAxisLength';
+
+for th = thresholds
+    S.threshold = th;
+
+    S = S.toBinary;
+
+    S = S.getCells;
+
+    expression = '\.';
+    replace = '\_';
+    fieldname = ['th',  regexprep(num2str(th),expression,replace)]
+    mal.(fieldname) = S.getCellsProperty(propName);
+    
+end
+
+figure
+hold on
+for fn = fieldnames(mal)'
+    res = cat(1,mal.(fn{1})(:).(propName));
+    nbins = 
+    [N,edges] = histcounts(res,10);
+    plot(N,(edges(1:end-1)));
+end
+
+
