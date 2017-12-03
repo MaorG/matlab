@@ -46,9 +46,10 @@ for i = 1:numel(allData)
     end
 end
 
+%% randrate
 % store in ndtable
 
-pNames = {'time', 'conc', 'd1', 'randrate'}; 
+pNames = {'intervalNum', 'conc', 'd1', 'randrate'}; 
 rt10 = createNDResultTable(randData, 'p10', pNames);
 rt11 = createNDResultTable(randData, 'p11', pNames);
 
@@ -76,7 +77,9 @@ rtrand = rt10;
 rtrand.T = TT;
 rtrand = colateFieldResultTable(rtrand, 'randrate');
 
-pNames = {'time', 'conc', 'd1'}; 
+
+%%  pref rate
+pNames = {'intervalNum', 'conc', 'd1', 's1'}; 
 rt10 = createNDResultTable(prefData, 'p10', pNames);
 rt11 = createNDResultTable(prefData, 'p11', pNames);
 
@@ -102,7 +105,11 @@ end
 % manipulate data
 rtpref = rt10;
 rtpref.T = TT;
+rtpref = colateFieldResultTable(rtpref, 's1');
 
+%%
+% manipulate data
+TT = rtrand.T;
 TTr = rtrand.T;
 TTp = rtpref.T;
 for i = 1:numel(TTr)
@@ -110,15 +117,6 @@ for i = 1:numel(TTr)
         m = struct;
         m.r = TTr{i};
         m.p = TTp{i};
-        
-
-        
-        % get slope of fraction of planktonic along the random variables
-         x = m.r{1}(2,:);
-         y = m.r{1}(4,:) ./ ( m.r{1}(4,:) + m.r{1}(5,:) );
-         
-         p = polyfit(x,y,1);
-        
         
         TT{i} = {[m,m]};
     else
@@ -132,7 +130,7 @@ rtcomb.T = TT;
 
 
 
-%show
+%%show
 sss = @(m) plot2d(m,'combo_dual_axes');
 tableUI(rtcomb,sss,[]);
 

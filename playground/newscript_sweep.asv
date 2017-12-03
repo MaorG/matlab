@@ -46,25 +46,26 @@ for i = 1:numel(allData)
     end
 end
 
+%% randrate
 % store in ndtable
 
-pNames = {'time', 'conc', 'd1', 'randrate'}; 
+pNames = {'intervalNum', 'conc', 'd1', 'randrate'}; 
 rt10 = createNDResultTable(randData, 'p10', pNames);
 rt11 = createNDResultTable(randData, 'p11', pNames);
 
-% get mean and ste
+% get geomean and ste
 
 TT = rt10.T;
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
 
-        m10 = mean(cell2mat(rt10.T{i}));
-        m11 = mean(cell2mat(rt11.T{i}));
-        s10 = std(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
-        s11 = std(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
+        m10 = geomean(cell2mat(rt10.T{i}));
+        m11 = geomean(cell2mat(rt11.T{i}));
+        s10 = geostd(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
+        s11 = geostd(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
 
-        m1 = mean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
-        s1 = std(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
+        m1 = geomean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
+        s1 = geostd(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
         TT{i} = {[m1,s1, m10, m11]};
     else
         TT{i} = {nan};
@@ -76,23 +77,25 @@ rtrand = rt10;
 rtrand.T = TT;
 rtrand = colateFieldResultTable(rtrand, 'randrate');
 
-pNames = {'time', 'conc', 'd1'}; 
+
+%%  pref rate
+pNames = {'intervalNum', 'conc', 'd1', 's1'}; 
 rt10 = createNDResultTable(prefData, 'p10', pNames);
 rt11 = createNDResultTable(prefData, 'p11', pNames);
 
-% get mean and ste
+% get geomean and ste
 
 TT = rt10.T;
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
 
-        m10 = mean(cell2mat(rt10.T{i}));
-        m11 = mean(cell2mat(rt11.T{i}));
-        s10 = std(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
-        s11 = std(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
+        m10 = geomean(cell2mat(rt10.T{i}));
+        m11 = geomean(cell2mat(rt11.T{i}));
+        s10 = geostd(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
+        s11 = geostd(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
 
-        m1 = mean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
-        s1 = std(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
+        m1 = geomean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
+        s1 = geostd(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
         TT{i} = {[m1,s1, m10, m11]};
     else
         TT{i} = {nan};
@@ -102,7 +105,11 @@ end
 % manipulate data
 rtpref = rt10;
 rtpref.T = TT;
+rtpref = colateFieldResultTable(rtpref, 's1');
 
+%%
+% manipulate data
+TT = rtrand.T;
 TTr = rtrand.T;
 TTp = rtpref.T;
 for i = 1:numel(TTr)
@@ -110,15 +117,6 @@ for i = 1:numel(TTr)
         m = struct;
         m.r = TTr{i};
         m.p = TTp{i};
-        
-
-        
-        % get slope of fraction of planktonic along the random variables
-         x = m.r{1}(2,:);
-         y = m.r{1}(4,:) ./ ( m.r{1}(4,:) + m.r{1}(5,:) );
-         
-         p = polyfit(x,y,1);
-        
         
         TT{i} = {[m,m]};
     else
@@ -132,7 +130,7 @@ rtcomb.T = TT;
 
 
 
-%show
+%%show
 sss = @(m) plot2d(m,'combo_dual_axes');
 tableUI(rtcomb,sss,[]);
 
@@ -143,7 +141,7 @@ tableUI(rtcomb,sss,[]);
 TT = rtcomb.T;
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
-        TT{i} = mean(rtcomb.T{i}{1}(1).r{1}(2,:));
+        TT{i} = geomean(rtcomb.T{i}{1}(1).r{1}(2,:));
     else
         TT{i} = {nan};
     end

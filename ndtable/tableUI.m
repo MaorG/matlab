@@ -411,9 +411,14 @@ end
 
 addTicks();
 
+
+% ---- this was supposed to be used as a way to show single values at each
+% ---- cell as a color, but it doesn't work very well. disabled for now.
 if iscell(a{1}) && numel(a{1}{1}) == 1
     updateslice();
 else
+%if false
+%else
     
     if numel(a{1}{1}) > 1 %&& numel(a) > 1
         updatetable();

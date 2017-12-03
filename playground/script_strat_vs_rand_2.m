@@ -1,10 +1,10 @@
-%%new script
+%new script
 
 init
 
-%% read and score
-dirname = 'C:\simulators\RepastSimphony-2.3.1\simulations\s_vs_no_s_01\light\';
-filter = @(d) (d.intervalNum == 160);
+% read and score
+dirname = 'C:\simulators\RepastSimphony-2.3.1\simulations\const_s_vs_no_s\';
+filter = @(d) (1);
 allData = parseExperimentDir(dirname, true, filter);
 allData = scoreAllData(allData, 'p10', @getCountOfPopulation, 'dbact10');
 allData = scoreAllData(allData, 'p11', @getCountOfPopulation, 'dbact11');
@@ -12,7 +12,7 @@ allData = scoreAllData(allData, 'p11', @getCountOfPopulation, 'dbact11');
 
 expression = '[\w\.]*';
 
-%% interpret
+% interpret
 if isfield(allData(1), 'stratexpr1')
     for i = 1:numel(allData)
         nums = regexp(allData(i).stratexpr1,expression,'match');
@@ -76,7 +76,7 @@ rtrand = rt10;
 rtrand.T = TT;
 rtrand = colateFieldResultTable(rtrand, 'randrate');
 
-pNames = {'time', 'conc', 'd1'}; 
+pNames = {'time', 'conc', 'd1', 's1'}; 
 rt10 = createNDResultTable(prefData, 'p10', pNames);
 rt11 = createNDResultTable(prefData, 'p11', pNames);
 
@@ -102,23 +102,15 @@ end
 % manipulate data
 rtpref = rt10;
 rtpref.T = TT;
+rtpref = colateFieldResultTable(rtpref, 's1');
 
 TTr = rtrand.T;
 TTp = rtpref.T;
-for i = 1:numel(TTr)
-    if (~isempty(TTr{i}))
+for i = 1:numel(TT)
+    if (~isempty(TT{i}))
         m = struct;
         m.r = TTr{i};
         m.p = TTp{i};
-        
-
-        
-        % get slope of fraction of planktonic along the random variables
-         x = m.r{1}(2,:);
-         y = m.r{1}(4,:) ./ ( m.r{1}(4,:) + m.r{1}(5,:) );
-         
-         p = polyfit(x,y,1);
-        
         
         TT{i} = {[m,m]};
     else
@@ -133,38 +125,5 @@ rtcomb.T = TT;
 
 
 %show
-sss = @(m) plot2d(m,'combo_dual_axes');
+sss = @(m) plot2d(m,'combo');
 tableUI(rtcomb,sss,[]);
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55555
-% just extracting some value
-TT = rtcomb.T;
-for i = 1:numel(TT)
-    if (~isempty(TT{i}))
-        TT{i} = mean(rtcomb.T{i}{1}(1).r{1}(2,:));
-    else
-        TT{i} = {nan};
-    end
-end
-
-% manipulate data
-rtval1 = rt10;
-rtval1.T = TT;
-
-TT = rtcomb.T;
-for i = 1:numel(TT)
-    if (~isempty(TT{i}))
-        TT{i} = rtcomb.T{i}{1}(1).p{1}(1);
-    else
-        TT{i} = {nan};
-    end
-end
-
-% manipulate data
-rtval2 = rt10;
-rtval2.T = TT;
-
-
-
