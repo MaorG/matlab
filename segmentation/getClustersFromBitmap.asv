@@ -31,14 +31,13 @@ clusters = struct;
 
 CC = bwconncomp(I);
 
-rp = regionprops(CC, 'Centroid', 'PixelList', 'Area', 'BoundingBox');
+rp = regionprops(CC, 'Centroid', 'PixelList', 'Area');
 centers = cat(1, rp.Centroid);
 pixels = cell(numel(rp),1);
 for ii = 1:numel(rp)
     pixels{ii} = rp(ii).PixelList;
 end
 areas = cat(1, rp.Area);
-BBs = cat(1, rp.BoundingBox);
 
 ids = find(areas > minClusterArea);
 
@@ -46,7 +45,12 @@ clusters.centers = centers(ids,:);
 clusters.areas = areas(ids,:);
 clusters.pixels = pixels(ids,:);
 clusters.imageSize = size(I);
-clusters.BB = BBs(ids,:);
+
+for i = 1:numel(props.additionalFields)
+    rp = regionprops(CC, props.additionalFields{i});
+    clusters.(props.additionalFields{i}) =
+end
+
 end
 
 function props = parseInput(varargin)
@@ -54,7 +58,8 @@ function props = parseInput(varargin)
         'minClusterArea', 10,...
         'clusterDilation', 4,...
         'threshold', 0.5,...
-        'nameI', 'I'...
+        'nameI', 'I',...
+        'additionalFields', []...
     );
     
     for i = 1:numel(varargin{1})
@@ -66,6 +71,8 @@ function props = parseInput(varargin)
             props.threshold = varargin{1}{i+1};
         elseif strcmpi(varargin{1}{i}, 'nameI')
             props.nameI = varargin{1}{i+1};
+        elseif strcmpi(varargin{1}{i}, 'additionalFields')
+            props.additionalFields = varargin{1}{i+1};
         end
     end
 end
