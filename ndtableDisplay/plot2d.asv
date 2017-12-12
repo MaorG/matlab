@@ -75,18 +75,16 @@ if true
         ax.Color = [0.6,0.6,0.6];
     elseif (maxy1 > 45000 && maxy2 > 45000)
         ax.Color = [0.8,0.6,0.8];
-%     elseif (maxy11 > maxy2)
-%         ax.Color = [1,0.5,0.5]*(maxy2/(maxy1 + maxy2));
-%     elseif (maxy1 < maxy22)
-%         ax.Color = [0.5,0.5,1]*(maxy1/(maxy1 + maxy2));
-    elseif (maxy11 > maxy2) ||  (maxy1 < maxy22)
-        ax.Color = [(maxy1/(maxy1 + maxy2)),0,(maxy2/(maxy1 + maxy2))]*0.8;
+    elseif (maxy11 > maxy2)
+        ax.Color = [1,0.8,0.8]*(maxy2/maxy1);
+    elseif (maxy1 < maxy22)
+        ax.Color = [0.8,0.8,1]*(maxy1/maxy2);
     end
 end
 
 
 maxy = max(maxy1,maxy2);
-%maxy = 50000;
+maxy = 50000;
 
 
 
@@ -110,8 +108,8 @@ errorbar(p(1,:), p(2,:), p(3,:),'Parent',ax2,'xb');
 
 set(ax1,'xscale','log')
 
-% set(ax1,'yscale','log')
-% set(ax2,'yscale','log')
+set(ax1,'yscale','log')
+set(ax2,'yscale','log')
 
 ylim(ax1,[1,maxy]);
 ylim(ax2,[1,maxy]);

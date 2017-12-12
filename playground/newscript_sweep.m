@@ -3,8 +3,9 @@
 init
 
 %% read and score
-dirname = 'C:\simulators\RepastSimphony-2.3.1\simulations\s_vs_no_s_01\light\';
+dirname = 'C:\simulators\RepastSimphony-2.3.1\simulations\s_vs_no_s_01\lightAll\';
 filter = @(d) (d.intervalNum == 160);
+%filter = @(d) (1);
 allData = parseExperimentDir(dirname, true, filter);
 allData = scoreAllData(allData, 'p10', @getCountOfPopulation, 'dbact10');
 allData = scoreAllData(allData, 'p11', @getCountOfPopulation, 'dbact11');
@@ -147,22 +148,54 @@ for i = 1:numel(TT)
     end
 end
 
-% manipulate data
-rtval1 = rt10;
-rtval1.T = TT;
+%% prepare tables
+randIdx = 1;
 
 TT = rtcomb.T;
+AA = nan(size(TT));
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
-        TT{i} = rtcomb.T{i}{1}(1).p{1}(1);
+        AA(i) = rtcomb.T{i}{1}(1).r{1}(2,randIdx );
     else
-        TT{i} = {nan};
+        AA(i) = nan;
     end
 end
 
-% manipulate data
-rtval2 = rt10;
-rtval2.T = TT;
+TT = rtcomb.T;
+RR = nan(size(TT));
+for i = 1:numel(TT)
+    if (~isempty(TT{i}))
+        RR(i) = rtcomb.T{i}{1}(1).r{1}(5,randIdx ) / rtcomb.T{i}{1}(1).r{1}(2,randIdx );
+    else
+        RR(i) = nan;
+    end
+end
+
+
+pNames = {'intervalNum', 'conc', 'd1'}; 
+rtconc = createNDResultTable(randData, 'conc', pNames);
+TT = rtconc.T;
+CC = nan(size(TT));
+for i = 1:numel(TT)
+    if (~isempty(TT{i}))
+        CC(i) = TT{i}{1};
+    else
+        CC(i) = nan;
+    end
+end
+
+rtdeath = createNDResultTable(randData, 'd1', pNames);
+TT = rtdeath.T;
+DD = nan(size(TT));
+for i = 1:numel(TT)
+    if (~isempty(TT{i}))
+        DD(i) = TT{i}{1};
+    else
+        DD(i) = nan;
+    end
+end
+
+
 
 
 

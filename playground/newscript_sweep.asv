@@ -5,6 +5,7 @@ init
 %% read and score
 dirname = 'C:\simulators\RepastSimphony-2.3.1\simulations\s_vs_no_s_01\light\';
 filter = @(d) (d.intervalNum == 160);
+filter = @(d) (1);
 allData = parseExperimentDir(dirname, true, filter);
 allData = scoreAllData(allData, 'p10', @getCountOfPopulation, 'dbact10');
 allData = scoreAllData(allData, 'p11', @getCountOfPopulation, 'dbact11');
@@ -53,19 +54,19 @@ pNames = {'intervalNum', 'conc', 'd1', 'randrate'};
 rt10 = createNDResultTable(randData, 'p10', pNames);
 rt11 = createNDResultTable(randData, 'p11', pNames);
 
-% get geomean and ste
+% get mean and ste
 
 TT = rt10.T;
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
 
-        m10 = geomean(cell2mat(rt10.T{i}));
-        m11 = geomean(cell2mat(rt11.T{i}));
-        s10 = geostd(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
-        s11 = geostd(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
+        m10 = mean(cell2mat(rt10.T{i}));
+        m11 = mean(cell2mat(rt11.T{i}));
+        s10 = std(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
+        s11 = std(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
 
-        m1 = geomean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
-        s1 = geostd(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
+        m1 = mean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
+        s1 = std(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
         TT{i} = {[m1,s1, m10, m11]};
     else
         TT{i} = {nan};
@@ -83,19 +84,19 @@ pNames = {'intervalNum', 'conc', 'd1', 's1'};
 rt10 = createNDResultTable(prefData, 'p10', pNames);
 rt11 = createNDResultTable(prefData, 'p11', pNames);
 
-% get geomean and ste
+% get mean and ste
 
 TT = rt10.T;
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
 
-        m10 = geomean(cell2mat(rt10.T{i}));
-        m11 = geomean(cell2mat(rt11.T{i}));
-        s10 = geostd(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
-        s11 = geostd(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
+        m10 = mean(cell2mat(rt10.T{i}));
+        m11 = mean(cell2mat(rt11.T{i}));
+        s10 = std(cell2mat(rt10.T{i}))/sqrt(cell2mat(rt10.T{i}));
+        s11 = std(cell2mat(rt11.T{i}))/sqrt(cell2mat(rt11.T{i}));
 
-        m1 = geomean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
-        s1 = geostd(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
+        m1 = mean(cell2mat(rt10.T{i}) + cell2mat(rt11.T{i}));
+        s1 = std(cell2mat(rt11.T{i}) + cell2mat(rt10.T{i})) / sqrt(numel(cell2mat(rt10.T{i})));
         TT{i} = {[m1,s1, m10, m11]};
     else
         TT{i} = {nan};
@@ -141,28 +142,36 @@ tableUI(rtcomb,sss,[]);
 TT = rtcomb.T;
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
-        TT{i} = geomean(rtcomb.T{i}{1}(1).r{1}(2,:));
+        TT{i} = mean(rtcomb.T{i}{1}(1).r{1}(2,:));
     else
         TT{i} = {nan};
     end
 end
 
 % manipulate data
-rtval1 = rt10;
-rtval1.T = TT;
-
 TT = rtcomb.T;
+AA = nan(size(TT));
 for i = 1:numel(TT)
     if (~isempty(TT{i}))
-        TT{i} = rtcomb.T{i}{1}(1).p{1}(1);
+        AA(i) = rtcomb.T{i}{1}(1).r{1}(2,1);
     else
-        TT{i} = {nan};
+        AA(i) = nan;
     end
 end
 
-% manipulate data
-rtval2 = rt10;
-rtval2.T = TT;
+pNames = {'intervalNum', 'conc', 'd1', 'randrate'}; 
+rtconc = createNDResultTable(randData, 'conc', pNames);
+TT = rtcomb.T;
+AA = nan(size(TT));
+for i = 1:numel(TT)
+    if (~isempty(TT{i}))
+        AA(i) = rtcomb.T{i}{1}(1).r{1}(2,1);
+    else
+        AA(i) = nan;
+    end
+end
+endrtconc1 = colateFieldResultTable(rtconc, 'randrate');
+
 
 
 
