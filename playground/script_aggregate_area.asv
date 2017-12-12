@@ -74,12 +74,19 @@ for idx = 153:1:156
     II = zeros(sI2);
     for ii = 1:numel(L(:))
         if (L(ii) ~= 0)
-            II(ii) = log2(areas(L(ii)));
+            II(ii) = log2(areas(L(ii));
         end
     end
     
-    imagesc(II)
-    caxis([0,20]);
+    
+    sI2 = size(allData(idx).I2);
+    ps = cell2mat(allData(idx).clusters2.pixels);
+    
+    pi = sub2ind(sI2,ps(:,2),ps(:,1));
+    
+    I3 = zeros(sI2);
+    I3(pi) = 1;
+    imshow(cat(3,200*allData(idx).I2,zeros(size(allData(idx).I2)),65500*(I3)))
 end
 
 
