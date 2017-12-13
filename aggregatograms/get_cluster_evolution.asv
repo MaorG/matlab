@@ -8,8 +8,8 @@ for i = numel(series)-1:-1:1
     [ 'series ' , num2str(i) ]
     
     [matchNext, matchPrev] = OverlappingClusters(series(i).(props.clustersName), series(i+1).(props.clustersName),minArea);
-    series(i).(props.clustersName).nextIds = matchNext;
-    series(i+1).(props.clustersName).prevIds = matchPrev;
+    series(i).clusters.nextIds = matchNext;
+    series(i+1).clusters.prevIds = matchPrev;
 end
 
 
@@ -50,43 +50,26 @@ matchPrev = cell(numel(top.pixels), 1);
 
 % for each top cluster, find all bottom clusters that overlap it.
 for topi = 1:numel(top.pixels)
+    topx = top.pixels{topi}(:,1);
+    topy = top.pixels{topi}(:,2);
+    maxtopx = max(topx);
+    maxtopy = max(topy);
+    mintopx = min(topx);
+    mintopy = min(topy);
     
-    if top.areas(topi) < minArea
-        continue;
-    end
-     topx = top.pixels{topi}(:,1);
-     topy = top.pixels{topi}(:,2);
-%     maxtopx = max(topx);
-%     maxtopy = max(topy);
-%     mintopx = min(topx);
-%     mintopy = min(topy);
-%     
-    BBtop = ceil(top.BB(topi,:));
-    mintopx = BBtop(1);
-    mintopy = BBtop(2);
-    maxtopx = BBtop(3);
-    maxtopy = BBtop(4);
+    BB = ceil(top.BB(topi,:));
     
     for boti = 1:numel(bot.pixels)
+        botx = bot.pixels{boti}(:,1);
+        boty = bot.pixels{boti}(:,2);
         
-        if bot.areas(boti) < minArea
-            continue;
-        end
-         botx = bot.pixels{boti}(:,1);
-         boty = bot.pixels{boti}(:,2);
-%         
-%         maxbotx = max(botx);
-%         maxboty = max(boty);
-%         minbotx = min(botx);
-%         minboty = min(boty);
-        BBbot = ceil(bot.BB(boti,:));
-        minbotx = BBbot(1);
-        minboty = BBbot(2);
-        maxbotx = BBbot(3);
-        maxboty = BBbot(4);
-
+        maxbotx = max(botx);
+        maxboty = max(boty);
+        minbotx = min(botx);
+        minboty = min(boty);
+        
         % bounding boxes intersect?
-        if true || (~ (maxtopx < minbotx || maxbotx < mintopx) && ...
+        if (~ (maxtopx < minbotx || maxbotx < mintopx) && ...
                  ~ (maxtopy < minboty || maxboty < mintopy) )
             
             [~,xi,~] = intersect(botx, topx);

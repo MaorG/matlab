@@ -17,12 +17,9 @@ for datum = allData'
     belong = true;
     
     for i = 1:size(pNames,1)
-        if ischar( pVals{i} )
+        if isstring( pVals{i} )
             
-            if ~strcmp(datum.(pNames{i}), pVals{i})
-
-                datum.(pNames{i})
-                pVals{i}
+            if ~strcmp(datum.(pNames{i}), pVals{i}
                 belong = false;
             end
         else

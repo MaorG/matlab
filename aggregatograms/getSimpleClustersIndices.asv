@@ -12,7 +12,7 @@ for sidx = 1:numel(series)
     countMatSingle = nan(numel(series), numel(series(sidx).clusters2.areas));
     for cidx =  1:numel(series(sidx).clusters2.areas)
         v_cidx = getClusterSimpleLineageAux(series, sidx, cidx);
-        if (sum(~isnan(v_cidx)) > 1)
+        if (sum(~isnan(v_cidx)))
             cidxMat = cat(2,cidxMat, v_cidx);
         end
 

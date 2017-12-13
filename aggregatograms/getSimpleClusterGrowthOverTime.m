@@ -27,14 +27,14 @@ for i = 1:size(sortedCountMat,1)-1
     lowConfIdx = floor(N/ 20) + 1;
     highConfIdx = ceil(N * (19.0/20.0));
     
-     Yvals(i) = mean(vals);
-%      YvalsLow(i) = vals(lowConfIdx);
-%      YvalsHigh(i)  = vals(highConfIdx);
-
-     YvalsLow(i) =-  std(vals)./sqrt(numel(vals));
-     YvalsHigh(i)  = std(vals)./sqrt(numel(vals));
-
-
+    Yvals(i) = mean(vals);
+    %      YvalsLow(i) = vals(lowConfIdx);
+    %      YvalsHigh(i)  = vals(highConfIdx);
+    
+    YvalsLow(i) =-  std(vals)./sqrt(numel(vals));
+    YvalsHigh(i)  = std(vals)./sqrt(numel(vals));
+    
+    
 end
 
 X = 0.5* (1:numel(Yvals))';
@@ -78,8 +78,10 @@ if (~isempty(color) && numel(X) > 0)
         Yhigh,...
         ['-'], 'Color', color, 'LineWidth', 2)
     plot(X,exp(fitLogY(1:end-1)),['--'],'Color',color, 'LineWidth', 2);
-
-    text(X(end),Y(end),[num2str(exp(m))], 'Color', color, 'fontsize', 18);
+    
+    if (numel(X) > 0)
+        text(X(end),Y(end),[num2str(exp(m))], 'Color', color, 'fontsize', 18);
+    end
 end
 
 meanGrowth = Yvals(2:end) ./ Yvals(1:end-1);
@@ -151,7 +153,7 @@ counts = nan(numel(series), 1);
 for sidx = 1:numel(v_cidx)
     cidx = v_cidx(sidx);
     if (~isnan(cidx))
-        counts(sidx) = series(sidx).clusters.count(cidx);
+        counts(sidx) = series(sidx).clusters2.areas(cidx);
     end
 end
 
